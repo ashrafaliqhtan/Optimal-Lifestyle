@@ -1,0 +1,237 @@
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+/* Navigation Bar */
+.navbar {
+  background-color: blue;
+  padding: 1rem;
+}
+
+.navbar a {
+  color: #fff !important;
+}
+
+.navbar-brand {
+  font-weight: bold;
+}
+
+.navbar-toggler {
+  border-color: #fff;
+}
+
+.navbar-toggler-icon {
+  background-color: #fff;
+}
+
+.navbar-nav .nav-item .nav-link {
+  font-weight: 600;
+}
+
+.navbar-nav .nav-item.dropdown .dropdown-menu {
+  background-color: #28a745;
+}
+
+.navbar-nav .nav-item.dropdown .dropdown-item {
+  color: #fff;
+}
+
+.navbar-nav .nav-item.dropdown .dropdown-item:hover {
+  background-color: #218838;
+}
+
+.navbar-nav .ms-auto {
+  margin-left: auto;
+}
+
+/* Container */
+.container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Heading and Information Section */
+#heading {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+#heading + p {
+  font-size: 1rem;
+  color: #666;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* Return Button */
+#return {
+  font-size: 1rem;
+  color: #28a745;
+  display: block;
+  margin-top: 1rem;
+  text-decoration: none;
+}
+
+#return:hover {
+  text-decoration: underline;
+}
+
+/* Form Section */
+form {
+  margin-top: 2rem;
+}
+
+.form-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  border-radius: 0.375rem;
+  border: 1px solid #ccc;
+  padding: 0.75rem;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-control:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+button[type="submit"] {
+  background-color: #28a745;
+  color: white;
+  font-weight: bold;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background-color: #218838;
+}
+
+/* Food Catalogue */
+#cards .card {
+  border: none;
+  border-radius: 0.375rem;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+#cards .card .card-header {
+  background-color: #28a745;
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  padding: 0.75rem;
+  text-transform: uppercase;
+}
+
+#cards .card-body {
+  padding: 1rem;
+}
+
+#cards .card-body h7 {
+  font-weight: 600;
+}
+
+#cards .card-footer {
+  background-color: #dc3545;
+  color: white;
+  font-weight: bold;
+  padding: 0.75rem;
+  text-align: center;
+  cursor: pointer;
+}
+
+#cards .card-footer:hover {
+  background-color: #c82333;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  #heading {
+    font-size: 2rem;
+  }
+
+  #cards .row-cols-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .form-control {
+    font-size: 0.9rem;
+  }
+
+  button[type="submit"] {
+    width: 100%;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar .container-fluid {
+    padding: 0 1rem;
+  }
+
+  #heading {
+    font-size: 1.8rem;
+  }
+
+  .navbar-nav .nav-item .nav-link {
+    font-size: 0.9rem;
+  }
+
+  .container {
+    padding: 1rem;
+  }
+
+  .form-control {
+    font-size: 0.9rem;
+  }
+
+  button[type="submit"] {
+    font-size: 1rem;
+  }
+
+  #cards .row-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Footer */
+.navbar.bottom {
+  background-color: #28a745;
+  color: white;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.navbar.bottom a {
+  color: white;
+  text-decoration: none;
+}
+
+.navbar.bottom a:hover {
+  text-decoration: underline;
+}

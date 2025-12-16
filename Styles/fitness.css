@@ -1,0 +1,169 @@
+/* General Styles */
+body {
+    font-family: 'Lato', sans-serif;
+    background: url("../pictures/wallpaper/wallpaper1.jpg") center center no-repeat fixed;
+    background-size: cover;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar Styles */
+.navbar {
+    background-color: #28a745;
+    padding: 0.75rem 1rem;
+}
+
+.navbar-brand, .nav-link, .dropdown-item {
+    color: #fff !important;
+    font-weight: 600;
+}
+
+.navbar-brand:hover, .nav-link:hover, .dropdown-item:hover {
+    color: #d4d4d4 !important;
+}
+
+#navbar-right {
+    margin-right: 20px;
+}
+
+#navbar-dropdown {
+    margin-right: 20px;
+}
+
+/* Main Heading */
+#heading {
+    margin-top: 2rem;
+    font-weight: 700;
+    color: #28a745;
+    text-transform: uppercase;
+}
+
+#mainText {
+    padding-top: 1vh;
+    padding-bottom: 2vh;
+    font-size: 1.1rem;
+    color: #555;
+    text-align: center;
+}
+
+/* Fitness Schedule Cards */
+#cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    padding-top: 5vh;
+}
+
+/* Card Styling */
+.card {
+    background: white;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease-in-out;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Card Container for Flexibility */
+.card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Workout Statistics Section */
+.row {
+    justify-content: center;
+    margin-bottom: 50px;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.card-text {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+}
+
+/* Add New Plan */
+.add-new-plan {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.add-new-plan i {
+    font-size: 3rem;
+    color: #28a745;
+}
+
+.add-new-plan h5 {
+    margin-top: 0.5rem;
+    font-weight: bold;
+}
+
+/* Footer Styles */
+footer {
+    background-color: #28a745;
+    padding: 1rem;
+    color: white;
+    text-align: center;
+}
+
+footer a {
+    color: #fff;
+    text-decoration: underline;
+}
+
+footer a:hover {
+    color: #d4d4d4;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #heading {
+        font-size: 1.8rem;
+    }
+
+    .card {
+        width: 90%;
+    }
+
+    .card-title {
+        font-size: 1.3rem;
+    }
+
+    .card-text {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+
+    .card {
+        width: 100%;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+    }
+
+    .card-text {
+        font-size: 1.6rem;
+    }
+}

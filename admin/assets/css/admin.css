@@ -1,0 +1,169 @@
+/* ============================================
+   Sidebar General Styles
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100vh;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
+  color: #fff;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+/* When toggled, you might want to reduce the width */
+.sidebar.toggled {
+  width: 80px;
+}
+
+/* ============================================
+   Sidebar Brand
+   ============================================ */
+.sidebar .sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  font-size: 1.25rem;
+  text-decoration: none;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.sidebar .sidebar-brand-icon {
+  font-size: 2rem;
+  margin-right: 0.5rem;
+}
+
+/* ============================================
+   Sidebar Navigation
+   ============================================ */
+.navbar-nav {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.sidebar .nav-item {
+  position: relative;
+}
+
+.sidebar .nav-link {
+  display: block;
+  padding: 0.75rem 1.25rem;
+  color: #fff;
+  text-decoration: none;
+  transition: background 0.3s ease;
+  white-space: nowrap;
+}
+
+.sidebar .nav-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .nav-item.active > .nav-link {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Icons inside nav-links */
+.sidebar .nav-link i {
+  margin-right: 0.5rem;
+}
+
+/* ============================================
+   Divider & Heading
+   ============================================ */
+.sidebar-divider {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  margin: 1rem 0;
+}
+
+.sidebar-heading {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+}
+
+/* ============================================
+   Collapse (Dropdown) Menu Items
+   ============================================ */
+.collapse {
+  transition: height 0.3s ease;
+}
+
+.collapse .collapse-inner {
+  background: #fff;
+  color: #6c757d;
+  padding: 0.5rem 0;
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+
+.collapse .collapse-inner .collapse-header {
+  padding: 0.5rem 1.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #858796;
+}
+
+.collapse-item {
+  display: block;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.9rem;
+  color: #6c757d;
+  text-decoration: none;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.collapse-item:hover,
+.collapse-item.active {
+  background-color: #f8f9fc;
+  color: #3a3b45;
+}
+
+/* ============================================
+   Sidebar Toggler Button
+   ============================================ */
+#sidebarToggle {
+  display: inline-block;
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  margin: 1rem auto;
+  cursor: pointer;
+}
+
+/* ============================================
+   Responsive Adjustments
+   ============================================ */
+@media (max-width: 768px) {
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* ============================================
+   Additional Utility Classes
+   ============================================ */
+/* Utility class to rotate icons (e.g., caret for collapse toggling) */
+.rotate-90 {
+  transform: rotate(90deg);
+  transition: transform 0.3s ease;
+}
+
+/* Optional: if you need to hide text when sidebar is toggled */
+.sidebar.toggled .nav-link span,
+.sidebar.toggled .sidebar-brand-text {
+  display: none;
+}
+
+/* Smooth scrolling for sidebar (if needed) */
+.sidebar {
+  scroll-behavior: smooth;
+}

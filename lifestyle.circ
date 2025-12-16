@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project name="Binary Subtractor">
+  <circuit name="main">
+    <!-- 4-bit Ripple Borrow Subtractor using Adder + Two's Complement -->
+    <!-- Inputs: A[3..0], B[3..0] -->
+    <!-- Outputs: S[3..0], BORROW_OUT -->
+    <!-- Perform A - B = A + (~B) + 1 -->
+
+    <!-- Input Pins for A -->
+    <comp lib="0" loc="(50, 50)" name="InputPin" orientation="east">
+      <a name="facing" val="east"/>
+      <a name="label" val="A0"/>
+    </comp>
+    <comp lib="0" loc="(50, 100)" name="InputPin" orientation="east">
+      <a name="facing" val="east"/>
+      <a name="label" val="A1"/>
+    </comp>
+    <comp lib="0" loc="(50, 150)" name="InputPin" orientation="east">
+      <a name="facing" val="east"/>
+      <a name="label" val="A2"/>
+    </comp>
+    <comp lib="0" loc="(50, 200)" name="InputPin" orientation="east">
+      <a name="facing" val="east"/>
+      <a name="label" val="A3"/>
+    </comp>
+
+    <!-- Input Pins for B -->
+    <comp lib="0" loc="(50, 300)" name="InputPin" orientation="east">
+      <a name="facing" val="east"/>
+      <a name="label" val="B0"/>
+    </comp>
+    <comp lib="0" loc="(50, 350)" name="InputPin" orientation="east">
+      <a name="facing" val="east"/>
+      <a name="label" val="B1"/>
+    </comp>
+    <comp lib="0" loc="(50, 400)" name="InputPin" orientation="east">
+      <a name="facing" val="east"/>
+      <a name="label" val="B2"/>
+    </comp>
+    <comp lib="0" loc="(50, 450)" name="InputPin" orientation="east">
+      <a name="facing" val="east"/>
+      <a name="label" val="B3"/>
+    </comp>
+
+    <!-- Inverters for B bits -->
+    <comp lib="0" loc="(150, 300)" name="NotGate"/>
+    <comp lib="0" loc="(150, 350)" name="NotGate"/>
+    <comp lib="0" loc="(150, 400)" name="NotGate"/>
+    <comp lib="0" loc="(150, 450)" name="NotGate"/>
+
+    <!-- Connect B inputs to Inverters -->
+    <wire from="(70,300)" to="(150,310)"/>
+    <wire from="(70,350)" to="(150,360)"/>
+    <wire from="(70,400)" to="(150,410)"/>
+    <wire from="(70,450)" to="(150,460)"/>
+
+    <!-- 4-bit Ripple Carry Adder -->
+    <comp lib="0" loc="(300, 150)" name="Adder"/>
+    <a name="dataBitWidth" val="4"/>
+
+    <!-- Constant 1 for initial carry-in -->
+    <comp lib="0" loc="(150, 500)" name="Constant" orientation="east">
+      <a name="width" val="1"/>
+      <a name="value" val="1"/>
+    </comp>
+
+    <!-- Connect A bits to Adder -->
+    <wire from="(70,50)" to="(300,160)"/>
+    <wire from="(70,100)" to="(300,170)"/>
+    <wire from="(70,150)" to="(300,180)"/>
+    <wire from="(70,200)" to="(300,190)"/>
+
+    <!-- Connect inverted B bits to Adder -->
+    <wire from="(170,300)" to="(300,200)"/>
+    <wire from="(170,350)" to="(300,210)"/>
+    <wire from="(170,400)" to="(300,220)"/>
+    <wire from="(170,450)" to="(300,230)"/>
+
+    <!-- Connect constant to carry-in -->
+    <wire from="(170,500)" to="(300,140)"/>
+
+    <!-- Output pins for Sum bits -->
+    <comp lib="0" loc="(400, 150)" name="OutputPin" orientation="east">
+      <a name="label" val="S0"/>
+    </comp>
+    <comp lib="0" loc="(400, 200)" name="OutputPin" orientation="east">
+      <a name="label" val="S1"/>
+    </comp>
+    <comp lib="0" loc="(400, 250)" name="OutputPin" orientation="east">
+      <a name="label" val="S2"/>
+    </comp>
+    <comp lib="0" loc="(400, 300)" name="OutputPin" orientation="east">
+      <a name="label" val="S3"/>
+    </comp>
+
+    <!-- Borrow Out is final carry-out inverted -->
+    <comp lib="0" loc="(350, 350)" name="NotGate"/>
+    <comp lib="0" loc="(400, 350)" name="OutputPin" orientation="east">
+      <a name="label" val="BORROW_OUT"/>
+    </comp>
+    <!-- Connect Adder carry-out to borrow inverter -->
+    <wire from="(350, 120)" to="(350, 350)"/>
+    <wire from="(370, 350)" to="(400, 360)"/>
+
+  </circuit>
+</project>

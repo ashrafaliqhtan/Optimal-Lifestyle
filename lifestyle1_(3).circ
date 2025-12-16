@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<circuit name="Binary Subtractor" version="2">
+  <project source="Logisim" version="2.7.1"/>
+  <main>
+    <!-- Inputs: A0, B0, BorrowIn -->
+    <pin label="A0" location="(10,30)" orientation="east" facing="east" bitWidth="1"/>
+    <pin label="B0" location="(10,70)" orientation="east" facing="east" bitWidth="1"/>
+    <pin label="Bin" location="(10,110)" orientation="east" facing="east" bitWidth="1"/>
+
+    <!-- First XOR gate: A0 XOR B0 -->
+    <comp lib="0" name="XOR" loc="(80,30)">
+      <input name="A" fromPin="A0"/>
+      <input name="B" fromPin="B0"/>
+      <output name="S" to="(120,30)"/>
+    </comp>
+
+    <!-- Second XOR gate: (A0 XOR B0) XOR Bin → D0 -->
+    <comp lib="0" name="XOR" loc="(140,30)">
+      <input name="A" from="(120,30)"/>
+      <input name="B" fromPin="Bin"/>
+      <output name="S" toPin="D0"/>
+    </comp>
+    <output label="D0" location="(200,30)" orientation="east" facing="east"/>
+
+    <!-- NOT gate: ¬A0 -->
+    <comp lib="0" name="NOT" loc="(80,70)">
+      <input name="A" fromPin="A0"/>
+      <output name="Z" to="(120,70)"/>
+    </comp>
+
+    <!-- AND1: ¬A0 AND B0 -->
+    <comp lib="0" name="AND" loc="(140,70)">
+      <input name="A" from="(120,70)"/>
+      <input name="B" fromPin="B0"/>
+      <output name="Z" to="(180,70)"/>
+    </comp>
+
+    <!-- AND2: (A0 XOR B0) AND Bin -->
+    <comp lib="0" name="AND" loc="(140,110)">
+      <input name="A" from="(120,30)"/>
+      <input name="B" fromPin="Bin"/>
+      <output name="Z" to="(180,110)"/>
+    </comp>
+
+    <!-- OR gate: AND1 OR AND2 → Bout0 -->
+    <comp lib="0" name="OR" loc="(200,90)">
+      <input name="A" from="(180,70)"/>
+      <input name="B" from="(180,110)"/>
+      <output name="Z" toPin="Bout0"/>
+    </comp>
+    <output label="Bout0" location="(240,90)" orientation="east" facing="east"/>
+  </main>
+</circuit>

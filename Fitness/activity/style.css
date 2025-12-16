@@ -1,0 +1,206 @@
+/* Body & Background Default */
+html,
+body {
+  background-color: #f3f3f2 !important;
+}
+
+/* NavBar Design */
+.navbar-design {
+  background-color: #f3f3f2 !important;
+}
+
+/* Activity Banner */
+.background-photo-activity {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: 800px;
+  align-items: center;
+}
+.img-activity {
+  max-height: 800px;
+}
+.text-over {
+  position: absolute;
+  word-break: break-word;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Container Design */
+.container-translucent-trends {
+  border-radius: 30px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+  width: 500px;
+  height: 500px;
+  background-color: rgba(4, 241, 214, 0.8);
+  backdrop-filter: blur(6px) brightness(70%);
+  -webkit-backdrop-filter: blur(6px) brightness(70%);
+}
+.container-translucent-rings {
+  border-radius: 30px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+  width: 500px;
+  height: 500px;
+  background-color: rgba(19, 19, 19, 0.5);
+  backdrop-filter: blur(6px) brightness(70%);
+  -webkit-backdrop-filter: blur(6px) brightness(70%);
+}
+.container-translucent-activity {
+  border-radius: 30px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+  width: 500px;
+  height: 700px;
+  background-color: rgba(247, 31, 106, 0.8);
+  backdrop-filter: blur(6px) brightness(70%);
+  -webkit-backdrop-filter: blur(6px) brightness(70%);
+}
+.container-translucent-each-activity {
+  border-radius: 30px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+  width: 450px;
+  background-color: rgba(19, 19, 19, 0.5);
+}
+.container-translucent-each-weight {
+  border-radius: 23px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+  width: 150px;
+  height: 60px;
+  background-color: rgba(19, 19, 19, 0.5);
+}
+.container-translucent-each-activity:hover .icon-size-md-form{width: 70px;height: 70px}.container-translucent-each-activity:hover{background-color: rgba(19, 19, 19, 0.7);} {
+}
+
+/* Chart Design */
+g g path {
+  stroke: #f3f3f2;
+  stroke-opacity: 1;
+  stroke-width: 3px;
+}
+g g circle {
+  fill: #f3f3f2;
+  stroke: #f3f3f2;
+  stroke-width: 5px;
+}
+div.google-visualization-tooltip { padding: 2px; border: none;
+  background-color: rgba(19, 19, 19, 0.8); border-radius: 10px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+}
+div.google-visualization-tooltip div {
+  color: #f3f3f2;
+}
+
+/* Trends Container Design */
+.weights-icon{
+  height: 55px;
+  width: 55px;
+  filter: brightness(96%);
+  border-radius: 50%;
+}
+.weight-border {
+  position: absolute;
+  width: 100%;
+  margin-bottom: 8px;
+  height: 10px;
+  background-color: rgb(243, 243, 242);
+  fill: rgba(243, 243, 242, 0.8);
+}
+.weight-border-initial {
+  position: absolute;
+  width: 830px;
+  margin-bottom: 8px;
+  height: 10px;
+  background-color: rgb(243, 243, 242);
+  fill: rgba(243, 243, 242, 0.8);
+}
+.indicator-weight{
+  border-left: 7px solid rgb(243, 243, 242);
+  height: 25px;
+  display: flex;
+  left: 50%;
+  margin-left: -3px;
+  top: 0;
+  border-radius: 10px;
+}
+.margin-weight-side {
+  margin-left: 25px;
+  margin-right: 25px;
+}
+
+/* Height */
+.height_65{
+  height: 65%;
+}
+
+@media screen and (max-width: 990px){
+  .container-translucent-each-activity {
+    width: 450px;
+  }
+}
+@media screen and (max-width: 640px) {
+  .weight-border-initial {
+    width: 720px;
+  }
+  .container-translucent-each-activity {
+    max-width: 320px;
+  }
+  .chart{
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 350px;
+  }
+  .container-translucent-trends {
+    width: 450px;
+  }
+  .container-translucent-rings {
+    width: 450px;
+  }
+  .container-translucent-activity {
+    width: 450px;
+  }
+}
+@media screen and (max-width: 400px) {
+  .weight-border-initial {
+    width: 500px;
+  }
+  .container-translucent-each-activity {
+    max-width: 270px;
+  }
+  .chart{
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 300px;
+  }
+  .container-translucent-trends {
+    width: 350px;
+  }
+  .container-translucent-rings {
+    width: 350px;
+  }
+  .container-translucent-activity {
+    width: 350px;
+  }
+}
+@media screen and (max-width: 300px) {
+  .weight-border-initial {
+    width: 280px;
+  }
+  .container-translucent-each-activity {
+    max-width: 200px;
+  }
+  .no-workouts{
+    padding: 50%;
+  }
+  .chart{
+    width: 200px;
+  }
+  .container-translucent-trends {
+    width: 250px;
+  }
+  .container-translucent-rings {
+    width: 250px;
+  }
+  .container-translucent-activity {
+    width: 250px;
+  }
+}

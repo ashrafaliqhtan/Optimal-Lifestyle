@@ -1,0 +1,240 @@
+/* Body & Background Default */
+html,
+body {
+  background-color: #f3f3f2 !important;
+  background: url(../img/background/background_home.jpeg)
+  no-repeat center center fixed;
+  background-size: contain;
+}
+
+/* Container Design */
+.container-translucent-posts {
+  border-radius: 30px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+  width: 420px;
+  height: 700px;
+  background-color: rgba(153, 251, 11, 0.8);
+  backdrop-filter: blur(6px) brightness(70%);
+  -webkit-backdrop-filter: blur(6px) brightness(70%);
+}
+.container-translucent-friends {
+  border-radius: 30px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+  width: 420px;
+  height: 700px;
+  background-color: rgba(4, 241, 214, 0.8);
+  backdrop-filter: blur(6px) brightness(70%);
+  -webkit-backdrop-filter: blur(6px) brightness(70%);
+}
+.container-translucent-friends-activity {
+  border-radius: 30px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+  width: 420px;
+  height: 700px;
+  background-color: rgba(19, 19, 19, 0.5);
+  backdrop-filter: blur(6px) brightness(70%);
+  -webkit-backdrop-filter: blur(6px) brightness(70%);
+}
+.container-translucent-social-profile {
+  border-radius: 30px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+  width: 420px;
+  height: 700px;
+  background-color: rgba(247, 31, 106, 0.8);
+  backdrop-filter: blur(6px) brightness(70%);
+  -webkit-backdrop-filter: blur(6px) brightness(70%);
+}
+.container-translucent-message {
+  border-radius: 30px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+  width: 380px;
+  min-height: 130px;
+  background-color: rgba(19, 19, 19, 0.5);
+}
+.container-translucent-message:hover .friends-photo-sm{width: 70px;}.container-translucent-message:hover{background-color: rgba(19, 19, 19, 0.8);} {
+}
+.container-translucent-social-activities {
+  border-radius: 30px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+  width: 380px;
+  max-height: 180px;
+  background-color: rgba(247, 31, 106, 0.8);
+}
+.container-translucent-social-activities:hover .icon-size-md-form{width: 70px;height: 70px}.container-translucent-social-activities:hover{background-color: rgba(19, 19, 19, 0.8);} {
+}
+.container-translucent-each-friend{
+  border-radius: 30px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+  width: 380px;
+  background-color: rgba(19, 19, 19, 0.5);
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.container-translucent-each-friend:hover .friends-photo-md{width: 90px;}.container-translucent-each-friend:hover{background-color: rgba(19, 19, 19, 0.8);} {
+}
+
+/* NavBar Design */
+.navbar-design {
+  background-color: #f3f3f2 !important;
+}
+
+/* Profile Photo */
+.friends-photo-xl{
+  border-radius:50% ;
+  width: 250px;
+}
+.friends-photo-md {
+  border-radius:50% ;
+  width: 70px;
+  transition-duration: 0.5s;
+}
+.friends-photo-sm{
+  border-radius:50% ;
+  width: 50px;
+  transition-duration: 0.5s;
+}
+.friends-photo-sm:hover{
+  border-radius:50% ;
+  width: 60px;
+  transition-duration: 0.5s;
+}
+
+/* Display Content */
+.friends-align-end{
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  flex-direction: column;
+}
+.back-to-me-align-end{
+  position: relative;
+  display: flex;
+  margin-left: 86%;
+}
+.message-area{
+  background-color: rgba(19, 19, 19, 0.5);
+  color: #f3f3f3;
+  resize: none;
+  outline: none;
+  border: none;
+  border-radius: 30px;
+  padding: 18px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+}
+.message_content{
+  margin-left: 10%;
+  margin-right: 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 10px
+}
+
+@media screen and (max-width: 500px) {
+  .container-translucent-each-friend{
+    width: 325px;
+  }
+  .friends-photo-md {
+    width: 70px;
+    margin: 10px 0;
+  }
+  .container-translucent-each-friend:hover .friends-photo-md{width: 80px;}
+  .container-translucent-message {
+    width: 325px;
+  }
+  .container-translucent-message:hover .friends-photo-sm{width: 60px;}
+  .container-translucent-social-activities {
+    width: 325px;
+    max-height: 250px;
+  }
+  .icon-size-md-form{
+    margin: 7px 0;
+  }
+  .container-translucent-social-activities:hover .icon-size-md-form{width: 35px;height: 35px}
+  .row-space-between{
+    flex-wrap: wrap;
+    padding-top: 7px !important;
+    padding-bottom: 7px !important;
+    width: 300px;
+  }
+}
+@media screen and (max-width: 400px) {
+  .container-translucent-each-friend{
+    width: 270px;
+  }
+  .friends-photo-md {
+    width: 70px;
+    margin: 10px 0;
+  }
+  .container-translucent-each-friend:hover .friends-photo-md{width: 80px;}
+  .container-translucent-message {
+    width: 270px;
+  }
+  .container-translucent-message:hover .friends-photo-sm{width: 60px;}
+  .container-translucent-social-activities {
+    width: 270px;
+    max-height: 260px;
+  }
+  .icon-size-md-form{
+    margin: 7px 0;
+  }
+  .container-translucent-social-activities:hover .icon-size-md-form{width: 35px;height: 35px}
+  .row-space-between{
+    width: 250px;
+  }
+  .message-area{
+    width: 240px;
+  }
+  .friends-photo-xl{
+    width: 230px;
+  }
+  .padding-sides{
+    padding-right: 25px !important;
+    padding-left: 25px !important;
+  }
+  .mobile-text{
+    padding-right: 25px;
+    padding-left: 25px;
+  }
+  .back-to-me-align-end{
+    margin-left: 82%;
+  }
+}
+@media screen and (max-width: 300px) {
+  .container-translucent-each-friend{
+    width: 200px;
+  }
+  .friends-photo-md {
+    width: 70px;
+    margin: 10px 0;
+  }
+  .container-translucent-each-friend:hover .friends-photo-md{width: 80px;}
+  .container-translucent-message {
+    width: 200px;
+  }
+  .container-translucent-message:hover .friends-photo-sm{width: 60px;}
+  .container-translucent-social-activities {
+    width: 200px;
+    max-height: 330px;
+  }
+  .icon-size-md-form{
+    margin: 7px 0;
+  }
+  .container-translucent-social-activities:hover .icon-size-md-form{width: 35px;height: 35px}
+  .row-space-between{
+    width: 180px;
+  }
+  .message-area{
+    width: 200px;
+  }
+  .friends-photo-xl{
+    width: 180px;
+  }
+  .padding-sides{
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+  }
+  .back-to-me-align-end{
+    margin-left: 75%;
+  }
+}

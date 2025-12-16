@@ -1,0 +1,2318 @@
+
+
+<?php
+// Start session and include necessary scripts
+require_once '../session.php';
+include("../config.php");
+//include("../scripts/exercises_list.php");
+//include("../scripts/admin_dashboard.php");
+
+$data = getLoggedUserData($link);
+$id = $data['id'];
+
+// Ensure only admin access
+if ($data['user_type'] != 'admin') {
+    header('location: ../home');
+    exit();
+}
+
+// Dashboard Metrics (ensure these functions are defined in your backend)
+$totalUsers    = function_exists('getTotalUsers') ? getTotalUsers($link) : 0;
+$totalWorkouts = function_exists('getTotalWorkouts') ? getTotalWorkouts($link) : 0;
+$totalEarnings = function_exists('getTotalEarnings') ? getTotalEarnings($link) : 0;
+
+// Counter for workout listing
+$counter = 0;
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="../img/favicon.ico" />
+  <!-- Global & Custom Styles -->
+  <link rel="stylesheet" href="../global_style.css" />
+  <link rel="stylesheet" href="./style.css" />
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom Fonts and Icons (optional) -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <title>Admin Dashboard - Optimal Lifestyle</title>
+    <!-- jQuery, Bootstrap, and Chart.js -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- الترتيب الصحيح -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="your-custom-script.js"></script> <!-- يجب أن يكون بعد المكتبات -->
+  
+  
+  <style>
+    /* Modern and responsive custom styles */
+    body {
+      background: #f0f2f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .sidebar {
+      width: 260px;
+      height: 100vh;
+      background: #2c3e50;
+      color: #ecf0f1;
+      position: fixed;
+      padding: 20px;
+      overflow-y: auto;
+      transition: all 0.3s ease;
+    }
+    .sidebar h3 {
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+    .sidebar a {
+      color: #bdc3c7;
+      text-decoration: none;
+      display: block;
+      padding: 10px 15px;
+      margin: 5px 0;
+      border-radius: 4px;
+      transition: background 0.2s, color 0.2s;
+      cursor: pointer;
+    }
+    .sidebar a:hover,
+    .sidebar a.active {
+      background: #34495e;
+      color: #ecf0f1;
+    }
+    .main-content {
+      margin-left: 280px;
+      padding: 20px;
+      transition: margin-left 0.3s ease;
+    }
+/* التأكد من أن الأنماط صحيحة */
+.content-panel {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.content-panel.active {
+  display: block;
+  opacity: 1;
+}
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .card-metric {
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .workout-img {
+      width: 50px;
+      height: auto;
+      border-radius: 4px;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      .main-content {
+        margin-left: 0;
+      }
+    }
+    .announcement {
+      background-color: #fffbcc;
+      border: 1px solid #ffe58f;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Optimal Lifestyle</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+        <ul class="navbar-nav mb-2 mb-lg-0">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="adminMenu" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-user-cog"></i> Admin
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminMenu">
+              <li><a class="dropdown-item" href="../end_session.php">Sign Out</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Sidebar Navigation -->
+  <div class="sidebar">
+    <h3>Admin Panel</h3>
+    <a data-target="#dashboard-panel" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard Metrics</a>
+    <a data-target="#workouts-panel"><i class="fas fa-dumbbell"></i> Manage Workouts</a>
+    <a data-target="#users-panel"><i class="fas fa-users"></i> Manage Users</a>
+    <a data-target="#reports-panel"><i class="fas fa-chart-line"></i> Reports</a>
+    <a data-target="#logs-panel"><i class="fas fa-history"></i> Activity Logs</a>
+    <a data-target="#notifications-panel"><i class="fas fa-bell"></i> Notifications</a>
+    <a data-target="#export-panel"><i class="fas fa-file-export"></i> Data Export</a>
+    <a data-target="#calendar-panel"><i class="fas fa-calendar-alt"></i> Calendar</a>
+    <a data-target="#analytics-panel"><i class="fas fa-chart-pie"></i> Analytics Charts</a>
+    <a data-target="#settings-panel"><i class="fas fa-cogs"></i> System Settings</a>
+    <a data-target="#language-panel"><i class="fas fa-language"></i> Multi-Language</a>
+    <a data-target="#chat-panel"><i class="fas fa-comments"></i> Real-time Chat</a>
+    <a data-target="#email-panel"><i class="fas fa-envelope"></i> Email Campaign</a>
+    <a data-target="#security-panel"><i class="fas fa-shield-alt"></i> Security Settings</a>
+  </div>
+  
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Dashboard Metrics Panel -->
+<div id="dashboard-panel" class="content-panel active">
+  <h2>Dashboard Metrics</h2>
+  
+  <!-- Announcement Carousel -->
+  <div id="announcementCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <div class="announcement alert alert-info">
+          <strong>New Feature:</strong> User analytics now available in reports!
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="announcement alert alert-success">
+          <strong>Update:</strong> New workout categories added to library
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Enhanced Metric Cards -->
+    <div class="col-md-4 mb-4">
+      <div class="card bg-primary text-white card-metric hover-shadow">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="card-title">Total Users</h5>
+              <p class="card-text fs-2"><?= number_format($totalUsers) ?></p>
+              <div class="d-flex align-items-center">
+                <span class="badge bg-light text-primary me-2">+12%</span>
+                <span class="small">Last 30 days</span>
+              </div>
+            </div>
+            <div class="avatar-stack">
+              <div class="avatar"></div>
+              <div class="avatar"></div>
+              <div class="avatar">+<?= $newUsers ?></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+      <div class="card bg-success text-white card-metric hover-shadow">
+        <div class="card-body">
+          <h5 class="card-title">Total Workouts</h5>
+          <p class="card-text fs-2"><?= number_format($totalWorkouts) ?></p>
+          <div class="progress mt-2" style="height: 6px;">
+            <div class="progress-bar bg-light" role="progressbar" style="width: 75%" 
+                 aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+          <p class="small mt-2">75% monthly goal achieved</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+      <div class="card bg-warning text-white card-metric hover-shadow">
+        <div class="card-body">
+          <h5 class="card-title">Total Earnings</h5>
+          <p class="card-text fs-2">$<?= number_format($totalEarnings, 2) ?></p>
+          <div class="d-flex justify-content-between small">
+            <span>Monthly Target: $<?= number_format($earningsTarget, 2) ?></span>
+            <span><?= ($totalEarnings/$earningsTarget)*100 ?>%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="row mt-4">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">User Growth</h5>
+          <canvas id="userGrowthChart" style="height: 300px;"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Workout Distribution</h5>
+          <canvas id="workoutPieChart" style="height: 300px;"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions & Updates -->
+  <div class="row mt-4">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Quick Actions</h5>
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-primary btn-sm text-start">
+              <i class="fas fa-file-export me-2"></i>Generate Report
+            </button>
+            <button class="btn btn-outline-success btn-sm text-start">
+              <i class="fas fa-plus-circle me-2"></i>Add New Workout
+            </button>
+            <button class="btn btn-outline-info btn-sm text-start">
+              <i class="fas fa-envelope me-2"></i>Send Newsletter
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card mt-4">
+        <div class="card-body">
+          <h5 class="card-title">System Status</h5>
+          <div class="list-group">
+            <div class="list-group-item d-flex justify-content-between">
+              <span>API Status</span>
+              <span class="badge bg-success">Operational</span>
+            </div>
+            <div class="list-group-item d-flex justify-content-between">
+              <span>Database</span>
+              <span class="badge bg-success">Normal</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Recent Activity Timeline</h5>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-badge bg-success"></div>
+              <div class="timeline-content">
+                <h6>New Workout "HIIT Burn" Added</h6>
+                <span class="text-muted">2 hours ago by Admin</span>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-badge bg-info"></div>
+              <div class="timeline-content">
+                <h6>User Feedback Report Generated</h6>
+                <span class="text-muted">5 hours ago</span>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-badge bg-warning"></div>
+              <div class="timeline-content">
+                <h6>Security Patch Applied</h6>
+                <span class="text-muted">2025-03-10</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.hover-shadow:hover {
+  transform: translateY(-5px);
+  transition: transform 0.3s ease;
+}
+.avatar-stack {
+  display: flex;
+  position: relative;
+}
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  border: 2px solid #fff;
+  margin-left: -15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+.timeline {
+  border-left: 2px solid #eee;
+  padding-left: 20px;
+}
+.timeline-item {
+  position: relative;
+  margin-bottom: 20px;
+}
+.timeline-badge {
+  position: absolute;
+  left: -28px;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// User Growth Chart
+new Chart(document.getElementById('userGrowthChart'), {
+  type: 'line',
+  data: {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [{
+      label: 'Monthly Active Users',
+      data: [1200, 1450, 1620, 1890, 2100, 2350],
+      borderColor: '#4e73df',
+      tension: 0.4
+    }]
+  }
+});
+
+// Workout Distribution Chart
+new Chart(document.getElementById('workoutPieChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['HIIT', 'Yoga', 'Strength', 'Cardio'],
+    datasets: [{
+      data: [35, 25, 20, 20],
+      backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e']
+    }]
+  }
+});
+</script>
+    
+    <!-- Manage Workouts Panel -->
+<div id="workouts-panel" class="content-panel">
+  <h2>Manage Workouts</h2>
+  
+  <!-- Workout Statistics Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card bg-info text-white">
+        <div class="card-body">
+          <h5 class="card-title">Total Workouts</h5>
+          <p class="card-text fs-3"><?= count($exercise_list) ?></p>
+          <span class="badge bg-light text-info">+5% this month</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <h5 class="card-title">Avg Calories</h5>
+          <p class="card-text fs-3"><?= $averageCalories ?> kcal</p>
+          <div class="progress bg-light" style="height: 4px;">
+            <div class="progress-bar" style="width: 65%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning text-white">
+        <div class="card-body">
+          <h5 class="card-title">Popular Type</h5>
+          <p class="card-text fs-3">HIIT</p>
+          <span class="small">40% of total</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-danger text-white">
+        <div class="card-body">
+          <h5 class="card-title">Needs Update</h5>
+          <p class="card-text fs-3"><?= $outdatedCount ?></p>
+          <span class="small">Last reviewed >6mo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enhanced Search & Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-search"></i></span>
+            <input type="text" id="workoutSearch" class="form-control" 
+                   placeholder="Search workouts..." data-live-search="true">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" id="categoryFilter">
+            <option value="">All Categories</option>
+            <option>HIIT</option>
+            <option>Yoga</option>
+            <option>Strength</option>
+            <option>Cardio</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" id="calorieFilter">
+            <option value="">Calorie Range</option>
+            <option>0-300 kcal</option>
+            <option>301-500 kcal</option>
+            <option>501-800 kcal</option>
+            <option>800+ kcal</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enhanced Workouts Table -->
+  <div class="card">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="card-title mb-0">Workout List</h5>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-secondary" id="exportBtn">
+            <i class="fas fa-file-export"></i> Export
+          </button>
+          <div class="dropdown">
+            <button class="btn btn-sm btn-outline-danger dropdown-toggle" 
+                    data-bs-toggle="dropdown">
+              Bulk Actions
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#"><i class="fas fa-trash me-2"></i>Delete Selected</a></li>
+              <li><a class="dropdown-item" href="#"><i class="fas fa-tag me-2"></i>Update Category</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 30px;"><input type="checkbox" class="form-check-input"></th>
+              <th class="sortable">Exercise <i class="fas fa-sort ms-1"></i></th>
+              <th class="sortable">Calories/hr <i class="fas fa-sort ms-1"></i></th>
+              <th>Image</th>
+              <th>Category</th>
+              <th>Last Updated</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="workoutsTable">
+            <?php foreach ($exercise_list as $exercise) { ?>
+            <tr>
+              <td><input type="checkbox" class="form-check-input"></td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <img class="workout-img-thumb me-2" 
+                       src="data:image/jpg;base64,<?= base64_encode($exercise[1]) ?>" 
+                       alt="<?= $exercise[2] ?>">
+                  <?= $exercise[2] ?>
+                  <?php if($exercise['is_featured']): ?>
+                    <span class="badge bg-warning ms-2"><i class="fas fa-star"></i> Featured</span>
+                  <?php endif; ?>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <?= $exercise[3] ?> kcal
+                  <div class="progress ms-2" style="width: 80px; height: 6px;">
+                    <div class="progress-bar bg-success" 
+                         style="width: <?= ($exercise[3]/800)*100 ?>%"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary preview-img"
+                        data-img-src="data:image/jpg;base64,<?= base64_encode($exercise[1]) ?>">
+                  <i class="fas fa-expand"></i>
+                </button>
+              </td>
+              <td><span class="badge bg-secondary"><?= $exercise['category'] ?></span></td>
+              <td><?= date('M d, Y', strtotime($exercise['updated_at'])) ?></td>
+              <td>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-sm btn-info edit-btn" 
+                          data-id="<?= $exercise[0] ?>">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger delete-btn" 
+                          data-id="<?= $exercise[0] ?>">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                  <button class="btn btn-sm btn-warning feature-btn"
+                          data-id="<?= $exercise[0] ?>">
+                    <i class="fas fa-star"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <?php } ?>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination & Table Info -->
+      <div class="d-flex justify-content-between mt-3">
+        <div class="text-muted">Showing 1-10 of <?= count($exercise_list) ?> workouts</div>
+        <nav>
+          <ul class="pagination pagination-sm">
+            <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enhanced New Workout Form -->
+  <div class="card mt-4">
+    <div class="card-body">
+      <h5 class="card-title">Add New Workout</h5>
+      <form method="POST" enctype="multipart/form-data" class="row g-3" id="workoutForm">
+        <div class="col-md-3">
+          <label class="form-label">Exercise Type</label>
+          <input type="text" name="exercise_type" class="form-control" required>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Calories/hour</label>
+          <input type="number" name="kcal_hour" class="form-control" min="0" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Category</label>
+          <select name="category" class="form-select" required>
+            <option value="">Select Category</option>
+            <option>HIIT</option>
+            <option>Yoga</option>
+            <option>Strength</option>
+            <option>Cardio</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Workout Image</label>
+          <div class="input-group">
+            <input type="file" name="img_data" class="form-control" 
+                   accept="image/*" required id="imageUpload">
+            <button class="btn btn-outline-secondary" type="button" 
+                    id="imagePreviewBtn" disabled>
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="featured">
+            <label class="form-check-label">Feature this workout</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <button type="submit" name="new_workout" class="btn btn-success">
+            <i class="fas fa-plus-circle me-2"></i>Add Workout
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Workout Guidelines Accordion -->
+  <div class="card mt-4">
+    <div class="card-body">
+      <h5 class="card-title">Workout Guidelines</h5>
+      <div class="accordion" id="guidelinesAccordion">
+        <div class="accordion-item">
+          <h6 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                    data-bs-target="#guideline1">
+              Image Requirements
+            </button>
+          </h6>
+          <div id="guideline1" class="accordion-collapse collapse show">
+            <div class="accordion-body">
+              <ul class="list-unstyled">
+                <li><i class="fas fa-check-circle text-success me-2"></i>Minimum 800x600 resolution</li>
+                <li><i class="fas fa-check-circle text-success me-2"></i>Max file size 2MB</li>
+                <li><i class="fas fa-check-circle text-success me-2"></i>Clear exercise demonstration</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- More accordion items -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Image Preview Modal -->
+<div class="modal fade" id="imagePreviewModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <img src="" class="img-fluid" id="previewImage">
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.workout-img-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.sortable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.sortable:hover {
+  background-color: rgba(0,0,0,0.05);
+}
+.preview-img:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s;
+}
+</style>
+
+<script>
+// Image preview handler
+document.querySelectorAll('.preview-img').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.getElementById('previewImage').src = btn.dataset.imgSrc;
+    new bootstrap.Modal(document.getElementById('imagePreviewModal')).show();
+  });
+});
+
+// Live search implementation
+document.getElementById('workoutSearch').addEventListener('input', function() {
+  const searchValue = this.value.toLowerCase();
+  document.querySelectorAll('#workoutsTable tr').forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(searchValue) ? '' : 'none';
+  });
+});
+
+// Image upload preview
+document.getElementById('imageUpload').addEventListener('change', function(e) {
+  const previewBtn = document.getElementById('imagePreviewBtn');
+  if (this.files[0]) {
+    previewBtn.disabled = false;
+    previewBtn.addEventListener('click', () => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('previewImage').src = e.target.result;
+        new bootstrap.Modal(document.getElementById('imagePreviewModal')).show();
+      }
+      reader.readAsDataURL(this.files[0]);
+    });
+  }
+});
+</script>
+    
+    <!-- Manage Users Panel -->
+<div id="users-panel" class="content-panel">
+  <h2>Manage Users</h2>
+  
+  <!-- User Statistics Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <h5 class="card-title">Total Users</h5>
+          <p class="card-text fs-3">1,452</p>
+          <span class="badge bg-light text-primary">+12% this month</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <h5 class="card-title">Active Users</h5>
+          <p class="card-text fs-3">1,203</p>
+          <div class="progress bg-light" style="height: 4px;">
+            <div class="progress-bar" style="width: 82%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning text-white">
+        <div class="card-body">
+          <h5 class="card-title">Premium Members</h5>
+          <p class="card-text fs-3">689</p>
+          <span class="small">47% of total</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info text-white">
+        <div class="card-body">
+          <h5 class="card-title">Avg. Sessions</h5>
+          <p class="card-text fs-3">4.2</p>
+          <span class="small">Daily average</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enhanced User Controls -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-4">
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-search"></i></span>
+            <input type="text" id="userSearch" class="form-control" 
+                   placeholder="Search users...">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" id="roleFilter">
+            <option value="">All Roles</option>
+            <option>Member</option>
+            <option>Premium</option>
+            <option>Admin</option>
+            <option>Moderator</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" id="statusFilter">
+            <option value="">All Statuses</option>
+            <option>Active</option>
+            <option>Inactive</option>
+            <option>Suspended</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <div class="dropdown">
+            <button class="btn btn-primary w-100 dropdown-toggle" 
+                    data-bs-toggle="dropdown">
+              <i class="fas fa-plus me-2"></i>Add User
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" 
+                     data-bs-target="#newUserModal"><i class="fas fa-user-plus me-2"></i>New User</a></li>
+              <li><a class="dropdown-item" href="#"><i class="fas fa-file-import me-2"></i>Bulk Import</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enhanced Users Table -->
+  <div class="card">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="card-title mb-0">User List</h5>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-secondary" id="exportUsers">
+            <i class="fas fa-file-export me-2"></i>Export
+          </button>
+          <div class="dropdown">
+            <button class="btn btn-sm btn-outline-danger dropdown-toggle" 
+                    data-bs-toggle="dropdown">
+              Bulk Actions
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#"><i class="fas fa-envelope me-2"></i>Send Email</a></li>
+              <li><a class="dropdown-item" href="#"><i class="fas fa-trash me-2"></i>Delete Selected</a></li>
+              <li><a class="dropdown-item" href="#"><i class="fas fa-shield-alt me-2"></i>Change Role</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 30px;"><input type="checkbox" class="form-check-input"></th>
+              <th class="sortable">User <i class="fas fa-sort ms-1"></i></th>
+              <th class="sortable">Status <i class="fas fa-sort ms-1"></i></th>
+              <th class="sortable">Last Activity <i class="fas fa-sort ms-1"></i></th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" class="form-check-input"></td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <img src="https://via.placeholder.com/40" class="rounded-circle me-2" 
+                       alt="User avatar">
+                  <div>
+                    <div class="fw-bold">Aml Ali</div>
+                    <div class="text-muted small">user@example.com</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-success"><i class="fas fa-circle me-1"></i>Active</span>
+              </td>
+              <td>
+                <div class="text-muted small">2 hours ago</div>
+                <div class="text-muted small">From 192.168.1.1</div>
+              </td>
+              <td>
+                <select class="form-select form-select-sm user-role" 
+                        data-user-id="1">
+                  <option>Member</option>
+                  <option>Premium</option>
+                  <option>Admin</option>
+                </select>
+              </td>
+              <td>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-sm btn-outline-info" 
+                          data-bs-toggle="modal" 
+                          data-bs-target="#userDetailModal">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-warning">
+                    <i class="fas fa-envelope"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger delete-user">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <!-- Additional rows -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination & Table Info -->
+      <div class="d-flex justify-content-between mt-3">
+        <div class="text-muted">Showing 1-15 of 1,452 users</div>
+        <nav>
+          <ul class="pagination pagination-sm">
+            <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Detail Modal -->
+  <div class="modal fade" id="userDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">User Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Detailed user information -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New User Modal -->
+  <div class="modal fade" id="newUserModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create New User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="createUserForm">
+            <!-- Detailed user creation form -->
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enhanced Management Tips -->
+  <div class="card mt-4">
+    <div class="card-body">
+      <h5 class="card-title">User Management Guide</h5>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="alert alert-info">
+            <i class="fas fa-shield-alt me-2"></i>
+            <strong>Security Tip:</strong> Regularly review admin privileges
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="alert alert-success">
+            <i class="fas fa-chart-line me-2"></i>
+            <strong>Engagement Tip:</strong> Monitor inactive users weekly
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.user-role {
+  width: 120px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.user-role:hover {
+  background-color: rgba(0,0,0,0.05);
+}
+.sortable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.sortable:hover {
+  background-color: rgba(0,0,0,0.05);
+}
+</style>
+
+<script>
+// Live search implementation
+document.getElementById('userSearch').addEventListener('input', function() {
+  const searchValue = this.value.toLowerCase();
+  document.querySelectorAll('tbody tr').forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(searchValue) ? '' : 'none';
+  });
+});
+
+// Role change handler
+document.querySelectorAll('.user-role').forEach(select => {
+  select.addEventListener('change', function() {
+    const userId = this.dataset.userId;
+    const newRole = this.value;
+    // Add role update logic
+  });
+});
+
+// Delete confirmation
+document.querySelectorAll('.delete-user').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(confirm('Are you sure you want to delete this user?')) {
+      // Add deletion logic
+    }
+  });
+});
+</script>
+    
+    <!-- Reports Panel -->
+<div id="reports-panel" class="content-panel">
+  <h2>Analytics Reports</h2>
+  
+  <!-- Report Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-4">
+          <label class="form-label">Date Range</label>
+          <div class="input-group">
+            <input type="date" class="form-control" id="startDate">
+            <span class="input-group-text">to</span>
+            <input type="date" class="form-control" id="endDate">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Report Type</label>
+          <select class="form-select" id="reportType">
+            <option>Financial</option>
+            <option>User Analytics</option>
+            <option>Workout Trends</option>
+            <option>Custom</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Metrics</label>
+          <select class="form-select" multiple id="metricsSelect">
+            <option>Revenue</option>
+            <option>User Growth</option>
+            <option>Engagement</option>
+            <option>Workout Completion</option>
+          </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button class="btn btn-primary w-100" id="generateReport">
+            <i class="fas fa-sync me-2"></i>Generate
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Metrics Summary -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <h5 class="card-title">Total Revenue</h5>
+          <p class="card-text fs-3">$24,567.89</p>
+          <span class="badge bg-light text-primary">+8.2% vs last month</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <h5 class="card-title">Active Users</h5>
+          <p class="card-text fs-3">2,345</p>
+          <div class="progress bg-light" style="height: 4px;">
+            <div class="progress-bar" style="width: 65%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info text-white">
+        <div class="card-body">
+          <h5 class="card-title">Avg. Sessions</h5>
+          <p class="card-text fs-3">4.2</p>
+          <span class="small">Per active user</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning text-white">
+        <div class="card-body">
+          <h5 class="card-title">Completion Rate</h5>
+          <p class="card-text fs-3">78%</p>
+          <span class="small">Workout goals achieved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Visualizations -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Revenue Trends</h5>
+          <canvas id="revenueChart" style="height: 300px;"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">User Demographics</h5>
+          <canvas id="demographicsChart" style="height: 300px;"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Reports -->
+  <div class="card">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="card-title mb-0">Detailed Analysis</h5>
+        <div class="dropdown">
+          <button class="btn btn-sm btn-primary dropdown-toggle" 
+                  data-bs-toggle="dropdown">
+            <i class="fas fa-download me-2"></i>Export
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#"><i class="fas fa-file-pdf me-2"></i>PDF</a></li>
+            <li><a class="dropdown-item" href="#"><i class="fas fa-file-csv me-2"></i>CSV</a></li>
+            <li><a class="dropdown-item" href="#"><i class="fas fa-file-excel me-2"></i>Excel</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <h6>Top Performing Workouts</h6>
+          <div class="list-group">
+            <div class="list-group-item d-flex justify-content-between">
+              <span>HIIT Burn</span>
+              <span>1,234 sessions</span>
+            </div>
+            <!-- More items -->
+          </div>
+        </div>
+        <div class="col-md-6">
+          <h6>User Activity Heatmap</h6>
+          <div id="heatmap" style="height: 200px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Scheduling -->
+  <div class="card mt-4">
+    <div class="card-body">
+      <h5 class="card-title">Schedule Reports</h5>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Frequency</label>
+          <select class="form-select">
+            <option>Daily</option>
+            <option>Weekly</option>
+            <option>Monthly</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Recipients</label>
+          <input type="email" class="form-control" multiple>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          <button class="btn btn-success w-100">
+            <i class="fas fa-calendar-plus me-2"></i>Schedule
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+#heatmap {
+  min-height: 200px;
+  background: linear-gradient(90deg, 
+    rgba(33,150,243,0.1) 0%,
+    rgba(33,150,243,0.5) 50%,
+    rgba(33,150,243,1) 100%
+  );
+  border-radius: 8px;
+}
+.progress-bar {
+  transition: width 0.5s ease;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Revenue Chart
+new Chart(document.getElementById('revenueChart'), {
+  type: 'line',
+  data: {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [{
+      label: 'Monthly Revenue',
+      data: [12000, 15000, 18000, 21000, 19000, 23000],
+      borderColor: '#4e73df',
+      tension: 0.4,
+      fill: true
+    }]
+  }
+});
+
+// Demographics Chart
+new Chart(document.getElementById('demographicsChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['18-25', '26-35', '36-45', '45+'],
+    datasets: [{
+      data: [25, 40, 20, 15],
+      backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e']
+    }]
+  }
+});
+</script>
+    
+    <!-- Activity Logs Panel -->
+    <div id="logs-panel" class="content-panel">
+      <h2>Activity Logs</h2>
+      <p>Track recent actions and changes made by the admin team.</p>
+      <ul class="list-group">
+        <li class="list-group-item">Admin logged in on <?= date('Y-m-d H:i:s'); ?></li>
+        <li class="list-group-item">Workout "Cardio Blast" updated by admin.</li>
+        <li class="list-group-item">User "jane.doe@example.com" upgraded to Premium.</li>
+      </ul>
+    </div>
+    
+    <!-- Notifications Panel -->
+    <div id="notifications-panel" class="content-panel">
+      <h2>Notifications</h2>
+      <p>Stay updated on system alerts and new user messages.</p>
+      <ul class="list-group">
+        <li class="list-group-item">New user registered: mark.smith@example.com</li>
+        <li class="list-group-item">Security alert: Password policy update required.</li>
+        <li class="list-group-item">Reminder: Backup your database.</li>
+      </ul>
+    </div>
+    
+    <!-- Data Export Panel -->
+    <div id="export-panel" class="content-panel">
+      <h2>Data Export</h2>
+      <p>Export your data in CSV or Excel format for further analysis.</p>
+      <button class="btn btn-primary"><i class="fas fa-download"></i> Export Workouts (CSV)</button>
+      <button class="btn btn-secondary"><i class="fas fa-download"></i> Export Users (Excel)</button>
+      <div class="mt-3">
+        <p class="small text-muted">Note: Exports are available for the last 30 days of data.</p>
+      </div>
+    </div>
+    
+    <!-- Calendar Integration Panel -->
+<div id="calendar-panel" class="content-panel">
+  <h2>Event Calendar</h2>
+  
+  <!-- Calendar Controls -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary" id="prevWeek">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button class="btn btn-primary" id="nextWeek">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+          <button class="btn btn-outline-secondary" id="todayBtn">Today</button>
+        </div>
+        <div class="d-flex gap-3 align-items-center">
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+              <i class="fas fa-calendar-plus me-2"></i>New Event
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" data-event-type="class">
+                <i class="fas fa-dumbbell me-2"></i>Fitness Class
+              </a></li>
+              <li><a class="dropdown-item" href="#" data-event-type="maintenance">
+                <i class="fas fa-tools me-2"></i>Maintenance
+              </a></li>
+              <li><a class="dropdown-item" href="#" data-event-type="meeting">
+                <i class="fas fa-users me-2"></i>Staff Meeting
+              </a></li>
+            </ul>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="externalEventsToggle">
+            <label class="form-check-label" for="externalEventsToggle">Show External</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar Content -->
+  <div class="row">
+    <!-- External Events -->
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Quick Schedule</h5>
+          <div id="external-events" class="mb-3">
+            <div class="external-event bg-primary">Group Cycling</div>
+            <div class="external-event bg-success">Yoga Session</div>
+            <div class="external-event bg-warning">Equipment Check</div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <h6>Event Statistics</h6>
+              <div class="calendar-stats">
+                <div class="stat-item">
+                  <span class="badge bg-primary">12</span> Classes
+                </div>
+                <div class="stat-item">
+                  <span class="badge bg-success">8</span> Sessions
+                </div>
+                <div class="stat-item">
+                  <span class="badge bg-warning">3</span> Maintenance
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Calendar -->
+    <div class="col-md-9">
+      <div class="card">
+        <div class="card-body">
+          <div id="calendar"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event Modal -->
+  <div class="modal fade" id="eventModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Event Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="eventForm">
+            <div class="mb-3">
+              <label class="form-label">Event Title</label>
+              <input type="text" class="form-control" name="title" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Event Type</label>
+              <select class="form-select" name="eventType" required>
+                <option value="class">Fitness Class</option>
+                <option value="maintenance">Maintenance</option>
+                <option value="meeting">Staff Meeting</option>
+              </select>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Start Time</label>
+                <input type="datetime-local" class="form-control" name="start" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">End Time</label>
+                <input type="datetime-local" class="form-control" name="end" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Recurrence</label>
+              <select class="form-select" name="recurrence">
+                <option value="">None</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" id="deleteEvent">Delete</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary" form="eventForm">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+#calendar {
+  min-height: 600px;
+}
+.external-event {
+  cursor: move;
+  padding: 8px 12px;
+  margin: 5px 0;
+  border-radius: 4px;
+  color: white;
+}
+.fc-event {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.fc-event:hover {
+  transform: translateY(-2px);
+}
+.calendar-stats .stat-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+.fc-event-class { background-color: #4e73df; border-color: #4e73df; }
+.fc-event-maintenance { background-color: #f6c23e; border-color: #f6c23e; }
+.fc-event-meeting { background-color: #1cc88a; border-color: #1cc88a; }
+</style>
+
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@5.11.3/main.min.js'></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const calendarEl = document.getElementById('calendar');
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+    },
+    editable: true,
+    droppable: true,
+    events: [],
+    eventClick: function(info) {
+      const modal = new bootstrap.Modal(document.getElementById('eventModal'));
+      modal.show();
+    },
+    eventDidMount: function(info) {
+      info.el.setAttribute('data-bs-toggle', 'tooltip');
+      info.el.setAttribute('title', info.event.title);
+    }
+  });
+  calendar.render();
+
+  // Initialize external events
+  new FullCalendar.Draggable(document.getElementById('external-events'), {
+    itemSelector: '.external-event',
+    eventData: function(eventEl) {
+      return {
+        title: eventEl.innerText,
+        color: eventEl.style.backgroundColor
+      };
+    }
+  });
+
+  // Initialize tooltips
+  $('[data-bs-toggle="tooltip"]').tooltip();
+});
+</script>
+    
+    <!-- Analytics Charts Panel -->
+<div id="analytics-panel" class="content-panel">
+  <h2>Advanced Analytics</h2>
+  
+  <!-- Chart Controls -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-4">
+          <select class="form-select" id="metricSelect">
+            <option value="revenue">Revenue</option>
+            <option value="users">User Growth</option>
+            <option value="engagement">Engagement</option>
+            <option value="conversion">Conversion Rate</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <div class="input-group">
+            <input type="date" class="form-control" id="startDate">
+            <span class="input-group-text">to</span>
+            <input type="date" class="form-control" id="endDate">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="realTimeToggle">
+            <label class="form-check-label" for="realTimeToggle">Real-time Updates</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="comparePeriod">
+            <label class="form-check-label" for="comparePeriod">Compare Periods</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Metrics Summary -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card metric-card bg-primary text-white">
+        <div class="card-body">
+          <h5 class="card-title">Total Users</h5>
+          <p class="card-text fs-3">24.5K</p>
+          <div class="metric-trend">
+            <i class="fas fa-arrow-up text-success"></i> 12.4%
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card metric-card bg-success text-white">
+        <div class="card-body">
+          <h5 class="card-title">Avg. Sessions</h5>
+          <p class="card-text fs-3">4.2</p>
+          <div class="metric-trend">
+            <i class="fas fa-arrow-down text-danger"></i> 2.1%
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card metric-card bg-info text-white">
+        <div class="card-body">
+          <h5 class="card-title">Revenue</h5>
+          <p class="card-text fs-3">$45.2K</p>
+          <div class="metric-trend">
+            <i class="fas fa-arrow-up text-success"></i> 18.7%
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card metric-card bg-warning text-white">
+        <div class="card-body">
+          <h5 class="card-title">Bounce Rate</h5>
+          <p class="card-text fs-3">32%</p>
+          <div class="metric-trend">
+            <i class="fas fa-arrow-down text-danger"></i> 5.3%
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Charts -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Performance Overview</h5>
+          <canvas id="lineChart" style="height: 300px;"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Traffic Sources</h5>
+          <canvas id="doughnutChart" style="height: 300px;"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Additional Visualizations -->
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Conversion Funnel</h5>
+          <canvas id="funnelChart" style="height: 250px;"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Geographic Distribution</h5>
+          <div id="mapChart" style="height: 250px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Goal Completion</h5>
+          <div class="progress-stack">
+            <div class="progress-item">
+              <div class="d-flex justify-content-between">
+                <span>Registration</span>
+                <span>85%</span>
+              </div>
+              <div class="progress" style="height: 8px;">
+                <div class="progress-bar bg-success" style="width: 85%"></div>
+              </div>
+            </div>
+            <!-- More progress items -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export & Annotations -->
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Data Annotations</h5>
+          <div class="annotations">
+            <div class="annotation-item">
+              <span class="annotation-marker bg-primary"></span>
+              <div class="annotation-text">
+                <strong>Marketing Campaign:</strong> Launched new social media strategy
+              </div>
+            </div>
+            <!-- More annotations -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Export Data</h5>
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-secondary text-start">
+              <i class="fas fa-file-image me-2"></i>Export as Image
+            </button>
+            <button class="btn btn-outline-secondary text-start">
+              <i class="fas fa-file-csv me-2"></i>Export as CSV
+            </button>
+            <button class="btn btn-outline-secondary text-start">
+              <i class="fas fa-file-pdf me-2"></i>Export as PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.metric-card {
+  transition: transform 0.3s;
+}
+.metric-card:hover {
+  transform: translateY(-5px);
+}
+.metric-trend {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+.progress-stack .progress-item {
+  margin-bottom: 1.5rem;
+}
+.annotation-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.annotation-marker {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 1rem;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Line Chart
+new Chart(document.getElementById('lineChart'), {
+  type: 'line',
+  data: {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [{
+      label: 'Revenue',
+      data: [12000, 19000, 3000, 5000, 2000, 30000],
+      borderColor: '#4e73df',
+      tension: 0.4
+    }, {
+      label: 'Users',
+      data: [4500, 6000, 8000, 5500, 7000, 9000],
+      borderColor: '#1cc88a',
+      tension: 0.4
+    }]
+  }
+});
+
+// Doughnut Chart
+new Chart(document.getElementById('doughnutChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Direct', 'Social', 'Email', 'Referral'],
+    datasets: [{
+      data: [55, 25, 15, 5],
+      backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e']
+    }]
+  }
+});
+
+// Funnel Chart
+new Chart(document.getElementById('funnelChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Visits', 'Signups', 'Purchases'],
+    datasets: [{
+      data: [1000, 600, 300],
+      backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc']
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    scales: {
+      x: { display: false },
+      y: { display: false }
+    }
+  }
+});
+</script>
+    
+    <!-- System Settings Panel -->
+<div id="settings-panel" class="content-panel">
+  <h2>System Configuration</h2>
+  
+  <!-- Settings Navigation -->
+  <div class="row">
+    <div class="col-md-3">
+      <div class="nav flex-column nav-pills">
+        <button class="nav-link active" data-bs-target="#general" data-bs-toggle="pill">General</button>
+        <button class="nav-link" data-bs-target="#security" data-bs-toggle="pill">Security</button>
+        <button class="nav-link" data-bs-target="#notifications" data-bs-toggle="pill">Notifications</button>
+        <button class="nav-link" data-bs-target="#integrations" data-bs-toggle="pill">Integrations</button>
+        <button class="nav-link" data-bs-target="#maintenance" data-bs-toggle="pill">Maintenance</button>
+      </div>
+    </div>
+
+    <!-- Settings Content -->
+    <div class="col-md-9">
+      <div class="tab-content">
+        <!-- General Settings -->
+        <div class="tab-pane fade show active" id="general">
+          <form id="settingsForm">
+            <div class="card mb-4">
+              <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-cog me-2"></i>Basic Settings</h5>
+                <div class="mb-3">
+                  <label class="form-label">Site Title</label>
+                  <input type="text" class="form-control" name="site_title" required>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label">Admin Email</label>
+                      <input type="email" class="form-control" name="admin_email" required>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label">Support Phone</label>
+                      <input type="tel" class="form-control" name="support_phone">
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Timezone</label>
+                  <select class="form-select" name="timezone">
+                    <option value="UTC">UTC</option>
+                    <!-- More timezone options -->
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Appearance Settings -->
+            <div class="card mb-4">
+              <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-palette me-2"></i>Appearance</h5>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label">Site Logo</label>
+                      <input type="file" class="form-control" accept="image/*">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label">Favicon</label>
+                      <input type="file" class="form-control" accept=".ico">
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Primary Color</label>
+                  <input type="color" class="form-control form-control-color" value="#4e73df">
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Security Settings -->
+        <div class="tab-pane fade" id="security">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title"><i class="fas fa-shield-alt me-2"></i>Security Settings</h5>
+              <div class="mb-3">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="2fa">
+                  <label class="form-check-label" for="2fa">Enable Two-Factor Authentication</label>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Password Requirements</label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="uppercase">
+                  <label class="form-check-label" for="uppercase">Require uppercase letters</label>
+                </div>
+                <!-- More password rules -->
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Session Timeout</label>
+                <select class="form-select">
+                  <option>15 minutes</option>
+                  <option>30 minutes</option>
+                  <option>1 hour</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <button class="btn btn-warning">
+                  <i class="fas fa-redo me-2"></i>Rotate API Keys
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notification Settings -->
+        <div class="tab-pane fade" id="notifications">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title"><i class="fas fa-bell me-2"></i>Notification Settings</h5>
+              <div class="mb-3">
+                <label class="form-label">Email Notifications</label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="adminAlerts">
+                  <label class="form-check-label" for="adminAlerts">Admin alerts</label>
+                </div>
+                <!-- More notification options -->
+              </div>
+              <div class="mb-3">
+                <label class="form-label">SMTP Configuration</label>
+                <div class="row">
+                  <div class="col-md-6">
+                    <input type="text" class="form-control" placeholder="SMTP Host">
+                  </div>
+                  <div class="col-md-6">
+                    <input type="number" class="form-control" placeholder="Port">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Integration Settings -->
+        <div class="tab-pane fade" id="integrations">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title"><i class="fas fa-plug me-2"></i>Third-Party Integrations</h5>
+              <div class="mb-3">
+                <label class="form-label">Google Analytics</label>
+                <input type="text" class="form-control" placeholder="Tracking ID">
+              </div>
+              <div class="mb-3">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="paymentGateway">
+                  <label class="form-check-label" for="paymentGateway">Enable Payment Gateway</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Maintenance Settings -->
+        <div class="tab-pane fade" id="maintenance">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title"><i class="fas fa-tools me-2"></i>Maintenance Mode</h5>
+              <div class="mb-3">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="maintenanceMode">
+                  <label class="form-check-label" for="maintenanceMode">Enable Maintenance Mode</label>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Custom Maintenance Message</label>
+                <textarea class="form-control" rows="4"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save Bar -->
+  <div class="settings-save-bar">
+    <div class="card">
+      <div class="card-body py-2">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="text-muted">You have unsaved changes</div>
+          <button type="submit" form="settingsForm" class="btn btn-success">
+            <i class="fas fa-save me-2"></i>Save All Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.settings-save-bar {
+  position: sticky;
+  bottom: 0;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+}
+.nav-pills .nav-link {
+  margin-bottom: 8px;
+  text-align: left;
+}
+.form-control-color {
+  height: calc(1.5em + 1rem + 2px);
+  padding: 0.5rem;
+}
+</style>
+
+<script>
+// Detect form changes
+document.getElementById('settingsForm').addEventListener('change', function() {
+  document.querySelector('.settings-save-bar .text-muted').textContent = 'You have unsaved changes';
+});
+
+// Prevent accidental navigation
+window.addEventListener('beforeunload', function(e) {
+  if(document.querySelector('.settings-save-bar .text-muted').textContent.includes('unsaved')) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+</script>
+    
+    <!-- Multi-language Support Panel -->
+    <div id="language-panel" class="content-panel">
+      <h2>Multi-Language Support</h2>
+      <p>Select the default language for your system.</p>
+      <select class="form-select">
+        <option value="en" selected>English</option>
+        <option value="ar">العربية</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+      </select>
+      <div class="mt-3">
+        <p class="small text-muted">Tip: Changing the language will affect system messages and UI elements.</p>
+      </div>
+    </div>
+    
+    <!-- Real-time Chat Panel -->
+<div id="chat-panel" class="content-panel">
+  <h2>Team Collaboration</h2>
+  
+  <!-- Chat Container -->
+  <div class="chat-container">
+    <!-- Channel List -->
+    <div class="chat-sidebar">
+      <div class="chat-header">
+        <h5>Channels</h5>
+        <button class="btn btn-sm btn-primary" id="newChannel">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+      <div class="channel-list">
+        <div class="channel active">
+          <i class="fas fa-hashtag"></i> general
+          <span class="badge bg-primary">3</span>
+        </div>
+        <div class="channel">
+          <i class="fas fa-hashtag"></i> announcements
+          <span class="badge bg-secondary">1</span>
+        </div>
+        <div class="channel">
+          <i class="fas fa-lock"></i> private
+        </div>
+      </div>
+      
+      <div class="chat-header mt-3">
+        <h5>Direct Messages</h5>
+      </div>
+      <div class="user-list">
+        <div class="user online">
+          <span class="status-dot"></span>
+          <img src="user1.jpg" class="avatar">
+          Aml Ali
+        </div>
+        <!-- More users -->
+      </div>
+    </div>
+
+    <!-- Chat Main Area -->
+    <div class="chat-main">
+      <!-- Chat Header -->
+      <div class="chat-header">
+        <div class="channel-info">
+          <h5><i class="fas fa-hashtag"></i> general</h5>
+          <span class="text-muted">4 members</span>
+        </div>
+        <div class="chat-actions">
+          <button class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-info-circle"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages Container -->
+      <div class="messages-container">
+        <div class="message">
+          <img src="user1.jpg" class="avatar">
+          <div class="message-content">
+            <div class="message-header">
+              <span class="username">Aml Ali</span>
+              <span class="timestamp">2:34 PM</span>
+            </div>
+            <div class="message-body">
+              Let's discuss the new workout plans!
+              <div class="reactions">
+                <span class="reaction">👍 2</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- More messages -->
+      </div>
+
+      <!-- Message Input -->
+      <div class="message-input">
+        <div class="input-tools">
+          <button class="btn btn-sm btn-link">
+            <i class="fas fa-paperclip"></i>
+          </button>
+          <button class="btn btn-sm btn-link">
+            <i class="fas fa-at"></i>
+          </button>
+          <button class="btn btn-sm btn-link">
+            <i class="fas fa-smile"></i>
+          </button>
+        </div>
+        <textarea 
+          class="form-control" 
+          placeholder="Message #general" 
+          rows="1"
+        ></textarea>
+        <button class="btn btn-primary">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Channel Modal -->
+  <div class="modal fade" id="channelModal">
+    <!-- Modal content -->
+  </div>
+</div>
+
+<style>
+.chat-container {
+  display: flex;
+  height: 70vh;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+}
+
+.chat-sidebar {
+  width: 240px;
+  border-right: 1px solid #dee2e6;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 1rem;
+}
+
+.message-input {
+  display: flex;
+  padding: 1rem;
+  border-top: 1px solid #dee2e6;
+  align-items: center;
+}
+
+.message-input textarea {
+  flex: 1;
+  margin: 0 1rem;
+  resize: none;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background: #28a745;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.online .status-dot {
+  background: #28a745;
+}
+
+.reaction {
+  background: rgba(0,0,0,0.05);
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  cursor: pointer;
+}
+</style>
+
+<script>
+// Basic chat functionality
+const messageInput = document.querySelector('.message-input textarea');
+messageInput.addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = this.scrollHeight + 'px';
+});
+
+// Send message on Enter
+messageInput.addEventListener('keypress', function(e) {
+  if(e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    // Add send message logic
+  }
+});
+</script>
+    
+    <!-- Email Campaign Manager Panel -->
+    <div id="email-panel" class="content-panel">
+      <h2>Email Campaign Manager</h2>
+      <p>Create, schedule, and send email campaigns to your users.</p>
+      <form>
+        <div class="mb-3">
+          <input type="text" class="form-control" placeholder="Campaign Title" required>
+        </div>
+        <div class="mb-3">
+          <textarea class="form-control" rows="4" placeholder="Campaign Content" required></textarea>
+        </div>
+        <div class="mb-3">
+          <input type="date" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-paper-plane"></i> Send Campaign
+        </button>
+      </form>
+    </div>
+    
+    <!-- Security Settings Panel -->
+    <div id="security-panel" class="content-panel">
+      <h2>Security Settings</h2>
+      <p>Manage your password policies and secure system settings.</p>
+      <form>
+        <div class="mb-3">
+          <label class="form-label">Password Complexity</label>
+          <select class="form-select">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Two-Factor Authentication</label>
+          <select class="form-select">
+            <option value="enabled" selected>Enabled</option>
+            <option value="disabled">Disabled</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-danger">Update Security Settings</button>
+      </form>
+      <div class="mt-3">
+        <p class="small text-muted">Note: Regularly review your security logs for unusual activity.</p>
+      </div>
+    </div>
+    
+  </div>
+  
+  <!-- Footer -->
+  <footer class="text-center mt-4">
+    <hr>
+    <p>Copyright © 2025 Optimal Lifestyle. All rights reserved. | KSA</p>
+  </footer>
+  
+
+  
+  <!-- Custom Scripts -->
+  <script>
+    
+document.addEventListener('DOMContentLoaded', function() {
+  const sidebarLinks = document.querySelectorAll('.sidebar a[data-target]');
+  
+  sidebarLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // إزالة النشاط من كل العناصر
+      sidebarLinks.forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+      
+      // إخفاء كل اللوحات
+      document.querySelectorAll('.content-panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
+      
+      // إظهار اللوحة المحددة
+      const target = this.dataset.target;
+      document.querySelector(target).classList.add('active');
+    });
+  });
+});
+      
+      // Filter workouts table based on search input
+      $('#workoutSearch').on('keyup', function() {
+        var value = $(this).val().toLowerCase();
+        $('#workoutsTable tr').filter(function() {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+      });
+      
+      // Initialize sample analytics chart
+      var ctx = document.getElementById('analyticsChart').getContext('2d');
+      new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+              datasets: [{
+                  label: 'Workouts',
+                  data: [12, 19, 3, 5, 2],
+                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                  borderColor: 'rgba(75, 192, 192, 1)',
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              scales: {
+                  y: { beginAtZero: true }
+              }
+          }
+      });
+    });
+  </script>
+</body>
+</html>

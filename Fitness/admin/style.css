@@ -1,0 +1,219 @@
+/* Body & Background Default */
+html,
+body {
+  background-color: #797979 !important;
+  background: no-repeat center center fixed ;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+  url(../img/background/background_admin.jpeg);
+  background-size: cover;
+}
+
+/* Container Design */
+.container-translucent-admin-workouts {
+  border-radius: 30px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+  width: 450px;
+  height: 700px;
+  background-color: rgba(247, 31, 106, 0.8);
+  backdrop-filter: blur(6px) brightness(70%);
+  -webkit-backdrop-filter: blur(6px) brightness(70%);
+}
+.container-translucent-update-workout {
+  border-radius: 30px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+  width: 450px;
+  height: 700px;
+  background-color: rgba(19, 19, 19, 0.5);
+  backdrop-filter: blur(6px) brightness(70%);
+  -webkit-backdrop-filter: blur(6px) brightness(70%);
+}
+.container-translucent-new-workout {
+  border-radius: 30px;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.5);
+  width: 450px;
+  height: 450px;
+  background-color: rgba(19, 19, 19, 0.5);
+  backdrop-filter: blur(6px) brightness(70%);
+  -webkit-backdrop-filter: blur(6px) brightness(70%);
+}
+
+/* Display Content */
+.wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.column-form{
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+}
+.row-around-100{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 100%;
+}
+
+/* NavBar Design */
+.navbar-design {
+  background-color: transparent !important;
+}
+.logo-style {
+  color: #99fb0b !important;
+}
+
+/* Footer Design */
+.borderline {
+  background-color: #f3f3f2;
+}
+.footer-text {
+  color: #f3f3f2 !important;
+}
+
+/* Placeholder Design */
+::placeholder {
+  color: #f3f3f2;
+  opacity: 1;
+}
+::-ms-input-placeholder {
+  color: #f3f3f2;
+}
+
+/* Margins */
+.margin-top-left{
+  margin-top: 80px;
+  margin-left: 30px !important;
+}
+.margin-add-workout{
+  margin-top: 50px;
+}
+
+/* Height */
+.height_400{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 400px;
+}
+.height_65{
+  height: 65%;
+  margin-bottom: 50px;
+}
+
+/* Buttons */
+.file-upload-button {
+  background-color: #f71f6a;
+  border-radius: 11px !important;
+  color: #e6e6e6;
+  padding: 6px 10px;
+  margin-top: 1vh;
+  cursor: pointer;
+  border: none;
+  text-align: center;
+  max-width: 220px;
+  margin-bottom: 30px;
+}
+
+/* Inputs */
+.input-field {
+  font-size: 16px !important;
+  line-height: 35px !important;
+  color: #f3f3f2;
+}
+.input-field:focus {
+  color: #f3f3f2;
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f3f3f2;
+  -webkit-box-shadow: transparent;
+  transition: background-color 5000s;
+}
+
+/* Display Content */
+.center-text{
+  text-align: center;
+  text-align-all: center;
+  padding: 0 30px;
+}
+
+/* Media Queries */
+@media screen and (max-width: 640px) {
+  .container-translucent-update-workout {
+    width: 450px;
+  }
+  .container-translucent-new-workout {
+    width: 450px;
+  }
+  .container-translucent-admin-workouts {
+    width: 450px;
+  }
+  .column-form{
+    width: 380px;
+  }
+  .row-around-100{
+     width: 450px;
+   }
+}
+@media screen and (max-width: 500px) {
+  .container-translucent-update-workout {
+    width: 380px;
+  }
+  .container-translucent-new-workout {
+    width: 380px;
+  }
+  .container-translucent-admin-workouts {
+    width: 380px;
+  }
+  .column-form{
+    width: 300px;
+  }
+  .row-around-100{
+    width: 350px;
+  }
+}
+@media screen and (max-width: 400px) {
+  .container-translucent-update-workout {
+    width: 320px;
+  }
+  .container-translucent-new-workout {
+    width: 320px;
+  }
+  .container-translucent-admin-workouts {
+    width: 320px;
+  }
+  .column-form{
+    width: 280px;
+  }
+}
+@media screen and (max-width: 300px) {
+  .container-translucent-update-workout {
+    width: 260px;
+  }
+  .container-translucent-new-workout {
+    width: 260px;
+  }
+  .container-translucent-admin-workouts {
+    width: 260px;
+  }
+  .column-form{
+    width: 180px;
+  }
+  .img-responsive{
+    display: none;
+  }
+  .wrap{
+    margin-top: 50px;
+    padding: 0 50%;
+  }
+}
