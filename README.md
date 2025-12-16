@@ -33,7 +33,7 @@
 
 <div align="center">
 
-```mermaid
+```
 graph TD
     A[User Registration] --> B[Personalized Profile]
     B --> C[Nutrition Tracking]
@@ -116,7 +116,7 @@ This research applies a step-by-step development methodology, with a focus on ag
 ## 🏗️ System Architecture
 
 ### High-Level Architecture
-```mermaid
+```
 graph TB
     subgraph "Client Layer"
         A[Web Browser]
