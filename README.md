@@ -33,7 +33,7 @@
 
 <div align="center">
 
-```
+```mermaid
 graph TD
     A[User Registration] --> B[Personalized Profile]
     B --> C[Nutrition Tracking]
@@ -116,7 +116,8 @@ This research applies a step-by-step development methodology, with a focus on ag
 ## 🏗️ System Architecture
 
 ### High-Level Architecture
-```
+
+```mermaid
 graph TB
     subgraph "Client Layer"
         A[Web Browser]
@@ -754,7 +755,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ```
 MIT License
 
-Copyright (c) 2024 Ashraf Ali Qhtan
+Copyright (c) 2025 Ashraf Ali Qhtan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
